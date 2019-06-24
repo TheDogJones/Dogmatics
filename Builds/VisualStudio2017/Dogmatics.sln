@@ -1,0 +1,39 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Dogmatics_VST3", "Dogmatics_VST3.vcxproj", "{7AF758E6-289F-509D-F795-A69E3EA6A526}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4DCDD212-83F9-0D29-2AA0-9FAA05E76ABC} = {4DCDD212-83F9-0D29-2AA0-9FAA05E76ABC}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Dogmatics_SharedCode", "Dogmatics_SharedCode.vcxproj", "{4DCDD212-83F9-0D29-2AA0-9FAA05E76ABC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AudioPluginHost_App", "..\..\..\JUCE\extras\AudioPluginHost\Builds\VisualStudio2017\AudioPluginHost_App.vcxproj", "{5666EAA2-C82B-D06A-5228-D0E810428536}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7AF758E6-289F-509D-F795-A69E3EA6A526}.Debug|x64.ActiveCfg = Debug|x64
+		{7AF758E6-289F-509D-F795-A69E3EA6A526}.Debug|x64.Build.0 = Debug|x64
+		{7AF758E6-289F-509D-F795-A69E3EA6A526}.Release|x64.ActiveCfg = Debug|x64
+		{7AF758E6-289F-509D-F795-A69E3EA6A526}.Release|x64.Build.0 = Debug|x64
+		{4DCDD212-83F9-0D29-2AA0-9FAA05E76ABC}.Debug|x64.ActiveCfg = Debug|x64
+		{4DCDD212-83F9-0D29-2AA0-9FAA05E76ABC}.Debug|x64.Build.0 = Debug|x64
+		{4DCDD212-83F9-0D29-2AA0-9FAA05E76ABC}.Release|x64.ActiveCfg = Debug|x64
+		{4DCDD212-83F9-0D29-2AA0-9FAA05E76ABC}.Release|x64.Build.0 = Debug|x64
+		{5666EAA2-C82B-D06A-5228-D0E810428536}.Debug|x64.ActiveCfg = Debug|x64
+		{5666EAA2-C82B-D06A-5228-D0E810428536}.Debug|x64.Build.0 = Debug|x64
+		{5666EAA2-C82B-D06A-5228-D0E810428536}.Release|x64.ActiveCfg = Debug|x64
+		{5666EAA2-C82B-D06A-5228-D0E810428536}.Release|x64.Build.0 = Debug|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E926AA12-2AA4-4FCE-BDDC-CB0AF5860707}
+	EndGlobalSection
+EndGlobal
