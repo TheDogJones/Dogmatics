@@ -15,12 +15,29 @@ EffectsPanel::EffectsPanel(DogmaticsAudioProcessor &p) : processor(p),
 	gain.setTextValueSuffix(" Volume");
 	gain.setValue(1.0);
 
-	gain.setBounds(677, 252, 40, 148);
+	gain.setBoundsRelative(0.01f,0.1f,0.05f,0.5f);
 
 	sine.setButtonText("Sine");
-	//sine.
+	sine.setBoundsRelative(0.3f, 0.1f, 0.2f, 0.1f);
+	sine.onClick = [&]() { processor.setHarmonics(Sine); };
+
+	saw.setButtonText("Saw");
+	saw.setBoundsRelative(0.3f, 0.3f, 0.2f, 0.1f);
+	saw.onClick = [&]() { processor.setHarmonics(Saw); };
+
+	square.setButtonText("Square");
+	square.setBoundsRelative(0.3f, 0.5f, 0.2f, 0.1f);
+	square.onClick = [&]() { processor.setHarmonics(Square); };
+
+	triangle.setButtonText("Triangle");
+	triangle.setBoundsRelative(0.3f, 0.7f, 0.2f, 0.1f);
+	triangle.onClick = [&]() { processor.setHarmonics(Triangle); };
 
 	addAndMakeVisible(gain);
+	addAndMakeVisible(sine);
+	addAndMakeVisible(saw);
+	addAndMakeVisible(square);
+	addAndMakeVisible(triangle);
 }
 
 EffectsPanel::~EffectsPanel() {
@@ -28,7 +45,6 @@ EffectsPanel::~EffectsPanel() {
 
 void EffectsPanelclear() {}
 void EffectsPanel::resized() { 
-	gain.setBounds(40, 30, 20, getHeight() - 60); 
 }
 
 void EffectsPanel::paint(Graphics& g) {
@@ -38,9 +54,5 @@ void EffectsPanel::paint(Graphics& g) {
 	g.setColour(Colours::white);
 	// set the font size and draw text to the screen
 	g.setFont(15.0f);
-	g.drawFittedText("Gain", 0, 0, getWidth(), 30, Justification::centred, 1);
-}
-
-void EffectsPanel::buttonClicked(Button *) {
-	//(DogmaticsAudioProcessorEditor*)(processor.getActiveEditor())->
+	g.drawFittedText("Gain", 5, 0, getWidth(), 30, Justification::left, 1);
 }

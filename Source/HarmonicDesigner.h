@@ -34,19 +34,20 @@ public:
 
 	void mouseUp(const MouseEvent &theEvent) override;
 	void mouseDrag(const MouseEvent &theEvent) override;
-	void mouseMove(const MouseEvent &theEvent) override;
 
 	void mouseWheelMove(const MouseEvent &theEvent, const MouseWheelDetails &theWheelDetails) override;
 
-	DogmaticsAudioProcessorEditor &getParent() const
-	{
+	DogmaticsAudioProcessorEditor &getParent() const {
 		return static_cast<DogmaticsAudioProcessorEditor&> (parent);
 	}
+
+	void notifyHarmonicsChanged() { harmonicsChanged = true; }
 	
 private:
 	//==============================================================================
 	DogmaticsAudioProcessorEditor &parent;
-	HeapBlock<Complex> myHarmonics, mySamples;
+	HeapBlock<Complex> mySamples;
+	Complex *myHarmonics;
 	const GLfloat xMin = 0.0f;
 	const GLfloat xMax = (GLfloat)WAVEFORM_SIZE;
 	const GLfloat yMin = -1.0f;

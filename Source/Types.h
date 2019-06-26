@@ -131,7 +131,7 @@ namespace Kyle
 	typedef function<void(Complex*, int)> Wave;
 	
 	static Wave Sine = [](auto *samples, auto size) -> auto {
-		samples[1] = Complex(0, 2 / pi);
+		samples[1] = Complex(0, 1);
 		for (int i = 2; i < size / 2; i++) {
 			samples[i] = Complex(0, 0);
 		}
@@ -145,7 +145,10 @@ namespace Kyle
 
 	static Wave Triangle = [](auto *samples, auto size) -> auto {
 		for (int i = 1; i < size / 2; i++) {
-			samples[i] = Complex(0, i % 2 == 0 ? 0 : 1 / (double)(i*i));
+			samples[i] = i % 2 == 0 ? Complex(0)
+									: i % 4 == 3 ? Complex(0, -1 / (double)(i*i))
+										         : Complex(0,  1 / (double)(i*i));
+				
 		}
 	};
 
@@ -153,7 +156,7 @@ namespace Kyle
 		samples[0] = Complex(0, 0);
 		Complex current;
 		for (int i = 1; i < size / 2; i++) {
-			current = Complex(0, 2 / pi / (double)i);
+			current = Complex(0, 1 / (double)i);
 			samples[i] = current;
 		}
 		samples[size - 1] = Complex(0, 0);

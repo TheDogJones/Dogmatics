@@ -47,8 +47,7 @@ void DogmaticsAudioProcessor::initializeSynth() {
 
 //==============================================================================
 
-void DogmaticsAudioProcessor::changeHarmonic(int theBin, double theMagnitude)
-{
+void DogmaticsAudioProcessor::changeHarmonic(int theBin, double theMagnitude) {
 	myHarmonics[theBin] = Complex(0, theMagnitude);
 	
 	for (int i = 0; i < mySynthesizer.getNumVoices(); i++) {
@@ -56,13 +55,20 @@ void DogmaticsAudioProcessor::changeHarmonic(int theBin, double theMagnitude)
 	}
 }
 
-void DogmaticsAudioProcessor::setBufferPointer(Queue<double>::Ptr buffer)
-{
+void DogmaticsAudioProcessor::setHarmonics(Wave theWave) {
+	theWave(myHarmonics, WAVEFORM_SIZE);
+
+	for (int i = 0; i < mySynthesizer.getNumVoices(); i++) {
+		((HarmonicWaveformVoice*)mySynthesizer.getVoice(i))->setHarmonics(myHarmonics);
+	}
+	((DogmaticsAudioProcessorEditor*)getActiveEditor())->harmonicsChanged();
+}
+
+void DogmaticsAudioProcessor::setBufferPointer(Queue<double>::Ptr buffer) {
 	sampleBuffer = buffer;
 }
 
-void DogmaticsAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
-{
+void DogmaticsAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock) {
 	ignoreUnused(samplesPerBlock);
 	mySynthesizer.setCurrentPlaybackSampleRate(sampleRate);
 	myKeyboardState.reset();

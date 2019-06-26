@@ -32,10 +32,13 @@ public:
 	
 	void mouseMove(const MouseEvent & theEvent);
 	Queue<double>::Ptr getBuffer() { return buffer; }
+
+	void harmonicsChanged();
 		
 private:
 	MidiKeyboardComponent myKeyboard;
-	TabbedComponent myTabbedComponent;
+	//TabbedComponent myTabbedComponent;
+	Component *container;
 	HarmonicDesigner *hd;
 
 	Queue<double>::Ptr buffer;

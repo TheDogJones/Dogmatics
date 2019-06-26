@@ -13,38 +13,46 @@ using namespace Kyle;
 //==============================================================================
 // Constructor
 DogmaticsAudioProcessorEditor::DogmaticsAudioProcessorEditor(DogmaticsAudioProcessor& p) : AudioProcessorEditor(p), processor(p),
-	 myKeyboard(p.myKeyboardState, MidiKeyboardComponent::horizontalKeyboard),
-	 myTabbedComponent(TabbedButtonBar::Orientation::TabsAtTop)
+	myKeyboard(p.myKeyboardState, MidiKeyboardComponent::horizontalKeyboard),
+	container(new Component("Container"))
 {
 	//testFFT();
 	buffer = new Queue<double>();
 	p.setBufferPointer(buffer);
 	
+	container->setBoundsRelative(0.f, 0.f, 1.f, 0.85f);
+	addAndMakeVisible(container);
+
 	// The tabs are the main attraction of this component
-	addAndMakeVisible(myTabbedComponent);
+	//addAndMakeVisible(myTabbedComponent);
 	setName("Dogmatics");
 
-	//EffectsPanel *ep = new EffectsPanel(processor);
-	//ep->Component::setBoundsInset(BorderSize(0));
+	EffectsPanel *ep = new EffectsPanel(processor);
+	ep->setBoundsRelative(0.5f, 0.5f, 0.5f, 0.5f);
 	//myTabbedComponent.addTab("Effects", Colours::black, ep, true);
+	container->addAndMakeVisible(ep);
 	
 	SpectralAnalyzer *sa = new SpectralAnalyzer(buffer);
-	sa->Component::setBoundsInset(BorderSize(0));
+	sa->setBoundsRelative(0.5f, 0.f, 0.5f, 0.5f);
 	sa->setSampleRate(p.getSampleRate());
-	myTabbedComponent.addTab("Spectral Analyzer", Colours::black, sa, true);
+	//myTabbedComponent.addTab("Spectral Analyzer", Colours::black, sa, true);
+	container->addAndMakeVisible(sa);
 	
 	hd = new HarmonicDesigner(*this);
-	hd->Component::setBoundsInset(BorderSize(0));
-	myTabbedComponent.addTab("Harmonic Designer", Colours::black, hd, true);
-	//myTabbedComponent.currentTabChanged(1, "Harmonic Designer");
+	hd->setBoundsRelative(0.f, 0.5f, 0.5f, 0.5f);
+	//myTabbedComponent.addTab("Harmonic Designer", Colours::black, hd, true);
+	container->addAndMakeVisible(hd);
 	hd->addActionListener(this);
 
 	Oscilloscope *osc = new Oscilloscope(*this);
-	osc->Component::setBoundsInset(BorderSize(0));
-	myTabbedComponent.addTab("Oscilloscope", Colours::black, osc, true);
+	osc->setBoundsRelative(0.f, 0.f, 0.5f, 0.5f);
+	//myTabbedComponent.addTab("Oscilloscope", Colours::black, osc, true);
+	container->addAndMakeVisible(osc);
 	
+	//myKeyboard.getOctaveForMiddleC
+	myKeyboard.setBoundsRelative(0.f, 0.85f, 1.f, 0.15f);
 	addAndMakeVisible(myKeyboard);
-	myTabbedComponent.setBoundsInset(BorderSize(0));
+	//myTabbedComponent.setBoundsInset(BorderSize(0));
 	setResizable(true, true);
 	setSize(1200, 800);
 	
@@ -72,8 +80,13 @@ void DogmaticsAudioProcessorEditor::mouseMove(const MouseEvent & theEvent) {
 	repaint();
 }
 
+void DogmaticsAudioProcessorEditor::harmonicsChanged() {
+	hd->notifyHarmonicsChanged(); 
+}
+
 void DogmaticsAudioProcessorEditor::resized()
 {
+	/*
 	// Put a 20-pixel padding in between all elements
 	const int w = getWidth(),
 		h = getHeight(),
@@ -81,11 +94,11 @@ void DogmaticsAudioProcessorEditor::resized()
 	const float keyboardScale = 0.15f;
 
 	// Set the bounds of the tabbed elements.
-	myTabbedComponent.setBounds(padding,padding,w - 2 * padding, lround(h*(1.0f - keyboardScale)) - 2 * padding);
+	//container->setBounds(padding,padding,w - 2 * padding, lround(h*(1.0f - keyboardScale)) - 2 * padding);
 
 	// Set the bounds of the keyboard and scale the keys to the width of the plugin
 	myKeyboard.setBounds(padding,lround(h * (1.0f - keyboardScale)) - padding,	w - padding * 2, lround(h * keyboardScale));
-	myKeyboard.setKeyWidth((float)myKeyboard.getWidth() / 75.0f);
+	myKeyboard.setKeyWidth((float)myKeyboard.getWidth() / 75.0f);*/
 }
 
 void DogmaticsAudioProcessorEditor::setSampleRate(int theSampleRate) {

@@ -61,6 +61,13 @@ public:
 		generateWaveform();
 	}
 
+	void setHarmonics(Complex *theHarmonics) {
+		for (int i = 0; i < WAVEFORM_SIZE; i++) {
+			myHarmonics[i] = Complex(theHarmonics[i]);
+		}
+		generateWaveform();
+	}
+
 	bool canPlaySound(SynthesiserSound* sound) override {
 		return dynamic_cast<HarmonicWaveformSound*> (sound) != nullptr;
 	}

@@ -27,8 +27,7 @@ public:
 	void paint(Graphics& g) override;
 	void render() override;
 	
-	DogmaticsAudioProcessorEditor &getParent() const
-	{
+	DogmaticsAudioProcessorEditor &getParent() const {
 		return static_cast<DogmaticsAudioProcessorEditor&> (parent);
 	}
 private:

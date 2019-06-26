@@ -24,23 +24,22 @@ void Oscilloscope::shutdown() {
 void Oscilloscope::clear() {}
 
 void Oscilloscope::resized() {
+	//repaint();
 }
 
 // Draw text in top left
 void Oscilloscope::paint(Graphics & g) {
-	g.setColour(Colours::white);
-	g.setFont(20);
-	g.drawText("Oscilloscope", g.getClipBounds(), Justification::topRight);
+	/*g.setColour(Colours::white);
+	g.setFont(15);
+	g.drawText("Oscilloscope", 25, 20, 320, 30, Justification::left);
+	g.drawLine(5, 5, 220, 20);
+	g.drawLine(5, 20, 220, 50);*/
 }
 
 // OpenGL render function. Keep this one super efficient!
 void Oscilloscope::render() {
 	const GLfloat width = 256;
 	const GLfloat halfWidth = 128;
-	
-	// Mark our location in read buffer
-	// myReadPos = (myReadPos + mySamplesReceived)&BUFFERMASK;
-	// mySamplesReceived = 0;
 
 	glClear(GL_COLOR_BUFFER_BIT);
 	glMatrixMode(GL_PROJECTION);

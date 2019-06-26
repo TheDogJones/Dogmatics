@@ -7,19 +7,12 @@ using namespace Kyle;
 //=======================================================================================
 // Constructor
 HarmonicDesigner::HarmonicDesigner(DogmaticsAudioProcessorEditor &p) : parent(p) {
-	
-	myHarmonics.allocate(WAVEFORM_SIZE, true);
-	Sine(myHarmonics, WAVEFORM_SIZE);
-	
+	//myHarmonics.allocate(WAVEFORM_SIZE, true);
+	myHarmonics = parent.getProcessor().getHarmonics();
 	calculateWave();
 }
 
-void HarmonicDesigner::mouseMove(const MouseEvent & theEvent) {
-	//Component::repaint();
-}
-
 HarmonicDesigner::~HarmonicDesigner() {
-	myHarmonics.free();
 	mySamples.free();
 	openGLContext.detach();
 	shutdownOpenGL();
@@ -27,11 +20,16 @@ HarmonicDesigner::~HarmonicDesigner() {
 //=======================================================================================
 
 void HarmonicDesigner::resized() {
-	//Component::setBoundsInset(BorderSize(0));
+	//repaint();
 }
 
 // repaint. write the text in the top left
 void HarmonicDesigner::paint(Graphics & g) {
+	/*g.setColour(Colours::white);
+	g.setFont(15);
+	g.drawText("Harmonic Designer", 25, 20, 320, 30, Justification::left);
+	g.drawLine(20, 20, 220, 20);
+	g.drawLine(20, 50, 220, 50);*/
 }
 
 // Draw the waveform in the background.
@@ -54,16 +52,8 @@ void HarmonicDesigner::calculateWave() {
 		if (mySamples[i].real() > waveMax) { waveMax = mySamples[i].real(); }
 	}
 
-	//glDeleteLists(list, 1);
-	//glNewList(list, GL_COMPILE);
-
-	//glEndList();
 	calculatingWave = false;
 }
-
-//void HarmonicDesigner::mouseMove(const MouseEvent & theEvent) {
-	//OpenGLAppComponent::repaint();
-//}
 
 //=======================================================================================
 // Conversion functions for converting x and y positions relative to screen to
@@ -136,21 +126,18 @@ void HarmonicDesigner::render() {
 	//------------------------------------
 	// Drawing harmonics:
 	//
-	// Each frequency bin x contains:
+	// The real components contain magnitude
+	// data that will be IFFT'd into a signal.
 	//
-	//  re{x} = double*cos*(phase)
-	//  im{x} = double*sin*(phase)
+	// Draw the harmonic as a vertical
+	// bar wherever the magnitude > 0.
 	//
-	// Draw the double as a vertical
-	// bar wherever the magnitude > 0
-	//
-	// Phase will require some arctan shit
 	//------------------------------------
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBegin(GL_QUADS);
 	for (int i = 1; i < WAVEFORM_SIZE >> 2; i++) {
-		double mag = std::sqrt(myHarmonics[i].real()*myHarmonics[i].real() + myHarmonics[i].imag()*myHarmonics[i].imag());
+		double mag = abs(myHarmonics[i]);
 		GLfloat x = (GLfloat)(i << 2);
 		if (mag > 0) {
 			GLfloat y = MagnitudeToWorldY(mag, x);

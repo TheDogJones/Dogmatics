@@ -6,15 +6,12 @@ using namespace Kyle;
 // Constructor
 SpectralAnalyzer::SpectralAnalyzer(Queue<double>::Ptr theBuffer) : OpenGLAppComponent(),
 		myBufferPointer(theBuffer) {
-		//forwardFFT(11), window(fftSize, dsp::WindowingFunction<float>::hann) {
 	readyToRender = false;
 	mySamples.allocate(fftSize, true);
 	fftData.allocate(fftSize, true);
 	mySampleRate = 0;
 	bufferReadPos = 0;
 	sampleIndex = 0;
-	list = glGenLists(1);
-	f = false;
 	startTimerHz(60);
 }
 
@@ -35,14 +32,16 @@ void SpectralAnalyzer::shutdown() {
 
 void SpectralAnalyzer::clear() {}
 
-void SpectralAnalyzer::resized() {}
+void SpectralAnalyzer::resized() {
+	//repaint();
+}
 
 void SpectralAnalyzer::paint(Graphics & g) {
-	g.setColour(Colours::white);
-	g.setFont(20);
-	g.drawText("Kyle SpectralAnalyzer", 25, 20, 320, 30, Justification::left);
+	/*g.setColour(Colours::white);
+	g.setFont(15);
+	g.drawText("Spectral Analyzer", 25, 20, 320, 30, Justification::left);
 	g.drawLine(20, 20, 220, 20);
-	g.drawLine(20, 50, 220, 50);
+	g.drawLine(20, 50, 220, 50);*/
 }
 
 // OpenGL render function. Keep this one efficient!
@@ -127,12 +126,6 @@ void SpectralAnalyzer::timerCallback() {
 	}
 }
 
-void SpectralAnalyzer::smooth(float smoothingFactor) {
-	//for (int i = 0; i < fftSize; i++)
-//	{
-		//fftSmooth[i] = smoothingFactor * fftSmooth[i] + ((1 - smoothingFactor) * fftData[i]);
-}
-
 // Run Fast Fourier Transform - Convert from time domain to frequency domain
 void SpectralAnalyzer::runFFT() {
 	for (int i = 0; i < fftSize; i++) {
@@ -141,23 +134,4 @@ void SpectralAnalyzer::runFFT() {
 		fftData[i] = multiplier * fftData[i];
 	}
 	Kyle::FFT::DoItForward(fftData.getData(), fftSize);
-	//window.multiplyWithWindowingTable(fftData, fftSize);
-	//forwardFFT.performFrequencyOnlyForwardTransform(fftData);
-	//DBG(fftData[6]);
-	/*double max = 0;
-	for (int i = 0; i < fftSize; i++) {
-		max = max(abs(fftData[i]), max);
-	}
-	if (max != 0)
-	{
-		for (int i = 0; i < fftSize; i++) {
-			fftData[i] /= max;
-		}
-	}*/
-	/*if (fftData[6].real() != 0)
-	{
-		for (int j = 0; j < fftSize/4; j++)
-			DBG(fftData[j].real());
-		int f = 0;
-	}*/
 }

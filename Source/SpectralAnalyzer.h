@@ -31,14 +31,12 @@ public:
 	void timerCallback() override;
 	void runFFT();
 
-	void smooth(float smoothingFactor);
-
-	enum
-	{
+	enum {
 		fftOrder = 12,             // [1]
 		fftSize = 1 << fftOrder,   // [2]
 		scopeSize = fftSize >> 1   // [3]
 	};
+
 private:
 	//==============================================================================
 	// X goes from 4 to 14.5 to represent the log2 of our
@@ -47,22 +45,11 @@ private:
 	const GLfloat xMax = 14.5;
 	const GLfloat yMin = 0;
 	const GLfloat yMax = 40;
-	//const GLfloat xMin = 0;
-	//const GLfloat xMax = fftSize;
-	//const GLfloat yMin = 0;
-	//const GLfloat yMax = 40;
-
-
-	GLuint list;
-
-	//dsp::FFT forwardFFT;
-	//dsp::WindowingFunction<float> window;
 
 	int mySampleRate;
 	double binWidth;
-	bool f;
 	Queue<double>::Ptr myBufferPointer;
-	//Queue<double>::Index bufferReadPos;
+
 	int bufferReadPos;
 	int sampleIndex;
 	bool readyToRender;

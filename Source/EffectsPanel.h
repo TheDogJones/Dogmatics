@@ -14,17 +14,16 @@ using namespace juce;
 //==========================================================================================
 // EffectsPanel.h: Main panel for displaying effects controls
 //==========================================================================================
-class EffectsPanel : public Component, public Button::Listener {
+class EffectsPanel : public Component {
 public:
 	EffectsPanel(DogmaticsAudioProcessor &p);
 	~EffectsPanel();
 
-	void clear();
+	//void clear();
 	void resized() override;
 	void paint(Graphics& g) override;
 
-	DogmaticsAudioProcessor &getProcessor() const
-	{
+	DogmaticsAudioProcessor &getProcessor() const {
 		return static_cast<DogmaticsAudioProcessor&> (processor);
 	}
 
@@ -32,12 +31,12 @@ private:
 	DogmaticsAudioProcessor &processor;
 	Slider gain;
 	TextButton sine;
+	TextButton saw;
+	TextButton square;
+	TextButton triangle;
 	AudioProcessorValueTreeState::SliderAttachment gainAttachment;
 
 	//==============================================================================
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(EffectsPanel)
-
-		// Inherited via Listener
-		virtual void buttonClicked(Button *) override;
 };
 #endif
