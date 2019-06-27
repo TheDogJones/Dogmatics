@@ -330,10 +330,10 @@
  #define JucePlugin_Name                   "Dogmatics"
 #endif
 #ifndef  JucePlugin_Desc
- #define JucePlugin_Desc                   "Dogmatics"
+ #define JucePlugin_Desc                   "Dogmatics Visual Additive Synthesizer"
 #endif
 #ifndef  JucePlugin_Manufacturer
- #define JucePlugin_Manufacturer           "Dog Jones"
+ #define JucePlugin_Manufacturer           "Dogmatics"
 #endif
 #ifndef  JucePlugin_ManufacturerWebsite
  #define JucePlugin_ManufacturerWebsite    ""
@@ -414,7 +414,7 @@
  #define JucePlugin_RTASDisableMultiMono   0
 #endif
 #ifndef  JucePlugin_AAXIdentifier
- #define JucePlugin_AAXIdentifier          com.yourcompany.Dogmatics
+ #define JucePlugin_AAXIdentifier          com.DogSoft.Dogmatics
 #endif
 #ifndef  JucePlugin_AAXManufacturerCode
  #define JucePlugin_AAXManufacturerCode    JucePlugin_ManufacturerCode
@@ -438,7 +438,7 @@
  #define JucePlugin_IAASubType             JucePlugin_PluginCode
 #endif
 #ifndef  JucePlugin_IAAName
- #define JucePlugin_IAAName                "Dog Jones: Dogmatics"
+ #define JucePlugin_IAAName                "Dogmatics: Dogmatics"
 #endif
 #ifndef  JucePlugin_VSTNumMidiInputs
  #define JucePlugin_VSTNumMidiInputs       16
