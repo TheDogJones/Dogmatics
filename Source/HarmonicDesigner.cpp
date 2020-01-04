@@ -175,7 +175,7 @@ void HarmonicDesigner::mouseUp(const MouseEvent & theEvent) {
 
 void HarmonicDesigner::mouseDrag(const MouseEvent & theEvent) {
 	int bin = GlobalToHarmonicX((GLfloat)theEvent.x);
-	if (bin == 0) { return; }
+	if (bin == 0 || bin > WAVEFORM_SIZE >> 2) { return; }
 	double mag = GlobalToMagnitudeY((GLfloat)theEvent.y) / bin;
 	myHarmonics[bin].imag(mag);
 	sendActionMessage(to_string(bin) + " " + to_string((mag)));

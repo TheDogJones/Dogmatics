@@ -14,47 +14,49 @@ using namespace Kyle;
 // Constructor
 DogmaticsAudioProcessorEditor::DogmaticsAudioProcessorEditor(DogmaticsAudioProcessor& p) : AudioProcessorEditor(p), processor(p),
 	myKeyboard(p.myKeyboardState, MidiKeyboardComponent::horizontalKeyboard),
-	container(new Component("Container"))
+	myContainer(make_unique<Component>("Container"))
 {
+	setResizable(true, true);
+	setSize(1200, 800);
 	//testFFT();
 	buffer = new Queue<double>();
 	p.setBufferPointer(buffer);
 	
-	container->setBoundsRelative(0.f, 0.f, 1.f, 0.85f);
-	addAndMakeVisible(container);
+	addChildComponent(*myContainer);
+	myContainer->setBoundsRelative(0.f, 0.f, 1.f, 0.85f);
+	myContainer->setVisible(true);
 
 	// The tabs are the main attraction of this component
 	//addAndMakeVisible(myTabbedComponent);
 	setName("Dogmatics");
 
-	EffectsPanel *ep = new EffectsPanel(processor);
-	ep->setBoundsRelative(0.5f, 0.5f, 0.5f, 0.5f);
+	myEffectsPanel = make_unique<EffectsPanel>(processor);
+	myContainer->addAndMakeVisible(*myEffectsPanel);
+	myEffectsPanel->setBoundsRelative(0.5f, 0.5f, 0.5f, 0.5f);
 	//myTabbedComponent.addTab("Effects", Colours::black, ep, true);
-	container->addAndMakeVisible(ep);
 	
-	SpectralAnalyzer *sa = new SpectralAnalyzer(buffer);
-	sa->setBoundsRelative(0.5f, 0.f, 0.5f, 0.5f);
-	sa->setSampleRate(p.getSampleRate());
+	mySpectralAnalyzer = make_unique<SpectralAnalyzer>(buffer);
+	myContainer->addAndMakeVisible(*mySpectralAnalyzer);
+	mySpectralAnalyzer->setBoundsRelative(0.5f, 0.f, 0.5f, 0.5f);
+	mySpectralAnalyzer->setSampleRate(p.getSampleRate());
 	//myTabbedComponent.addTab("Spectral Analyzer", Colours::black, sa, true);
-	container->addAndMakeVisible(sa);
 	
-	hd = new HarmonicDesigner(*this);
-	hd->setBoundsRelative(0.f, 0.5f, 0.5f, 0.5f);
-	//myTabbedComponent.addTab("Harmonic Designer", Colours::black, hd, true);
-	container->addAndMakeVisible(hd);
-	hd->addActionListener(this);
+	myHarmonicDesigner = make_unique<HarmonicDesigner>(*this);
+	myContainer->addAndMakeVisible(*myHarmonicDesigner);
+	myHarmonicDesigner->setBoundsRelative(0.f, 0.5f, 0.5f, 0.5f);
+	//myTabbedComponent.addTab("Harmonic Designer", Colours::black, myHarmonicDesigner, true);
+	myHarmonicDesigner->addActionListener(this);
 
-	Oscilloscope *osc = new Oscilloscope(*this);
-	osc->setBoundsRelative(0.f, 0.f, 0.5f, 0.5f);
+	myOscilloscope = make_unique<Oscilloscope>(*this);
+	myContainer->addAndMakeVisible(*myOscilloscope);
+	myOscilloscope->setBoundsRelative(0.f, 0.f, 0.5f, 0.5f);
 	//myTabbedComponent.addTab("Oscilloscope", Colours::black, osc, true);
-	container->addAndMakeVisible(osc);
 	
 	//myKeyboard.getOctaveForMiddleC
-	myKeyboard.setBoundsRelative(0.f, 0.85f, 1.f, 0.15f);
 	addAndMakeVisible(myKeyboard);
+	myKeyboard.setBoundsRelative(0.f, 0.85f, 1.f, 0.15f);
+	myKeyboard.setKeyWidth((float)myKeyboard.getWidth() / 75.0f);
 	//myTabbedComponent.setBoundsInset(BorderSize(0));
-	setResizable(true, true);
-	setSize(1200, 800);
 	
 	//processor.editorCallBack(this);
 }
@@ -81,24 +83,27 @@ void DogmaticsAudioProcessorEditor::mouseMove(const MouseEvent & theEvent) {
 }
 
 void DogmaticsAudioProcessorEditor::harmonicsChanged() {
-	hd->notifyHarmonicsChanged(); 
+	myHarmonicDesigner->notifyHarmonicsChanged(); 
 }
 
 void DogmaticsAudioProcessorEditor::resized()
 {
-	/*
-	// Put a 20-pixel padding in between all elements
-	const int w = getWidth(),
-		h = getHeight(),
-		padding = 20;
-	const float keyboardScale = 0.15f;
+	auto r = myContainer->getBoundsInParent();
+	myContainer->setBoundsRelative(0.f, 0.f, 1.f, 1.f - keyboardScale);
+	if (myEffectsPanel)
+		myEffectsPanel->setBoundsRelative(0.5f, 0.5f, 0.5f, 0.5f);
+	if (mySpectralAnalyzer)
+		mySpectralAnalyzer->setBoundsRelative(0.5f, 0.f, 0.5f, 0.5f);
+	if (myHarmonicDesigner)
+		myHarmonicDesigner->setBoundsRelative(0.f, 0.5f, 0.5f, 0.5f); 
+	if (myOscilloscope)
+		myOscilloscope->setBoundsRelative(0.f, 0.f, 0.5f, 0.5f);
 
-	// Set the bounds of the tabbed elements.
-	//container->setBounds(padding,padding,w - 2 * padding, lround(h*(1.0f - keyboardScale)) - 2 * padding);
-
-	// Set the bounds of the keyboard and scale the keys to the width of the plugin
-	myKeyboard.setBounds(padding,lround(h * (1.0f - keyboardScale)) - padding,	w - padding * 2, lround(h * keyboardScale));
-	myKeyboard.setKeyWidth((float)myKeyboard.getWidth() / 75.0f);*/
+	myKeyboard.setBoundsRelative(0.f, 1.f-keyboardScale, 1.f, keyboardScale);
+	
+	
+	const int w = getWidth(), h = getHeight();	
+	myKeyboard.setKeyWidth((float)myKeyboard.getWidth() / 75.0f);
 }
 
 void DogmaticsAudioProcessorEditor::setSampleRate(int theSampleRate) {

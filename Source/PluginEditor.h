@@ -36,10 +36,15 @@ public:
 	void harmonicsChanged();
 		
 private:
+	const float keyboardScale = 0.15f;
+	
 	MidiKeyboardComponent myKeyboard;
 	//TabbedComponent myTabbedComponent;
-	Component *container;
-	HarmonicDesigner *hd;
+	unique_ptr<Component> myContainer;
+	unique_ptr<Oscilloscope> myOscilloscope;
+	unique_ptr<SpectralAnalyzer> mySpectralAnalyzer;
+	unique_ptr<HarmonicDesigner> myHarmonicDesigner;
+	unique_ptr<EffectsPanel> myEffectsPanel;
 
 	Queue<double>::Ptr buffer;
 

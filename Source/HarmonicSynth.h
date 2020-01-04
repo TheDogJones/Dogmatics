@@ -86,7 +86,7 @@ public:
 		// Assuming our harmonic #1 is the fundamental, find the harmonic that
 		// passes the Nyquist double, and cutoff everything above that.
 		// This is how we prevent aliasing.
-		int cutoff_bin = floor((getSampleRate() / 2.0f / freq));
+		int cutoff_bin = (int)(getSampleRate() / 2.0f / freq);
 
 		// myDelta is the amount the phase of the waveform will shift with each
 		// sample. Will be larger on higher notes (higher freq.)

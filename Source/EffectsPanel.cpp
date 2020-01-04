@@ -15,22 +15,17 @@ EffectsPanel::EffectsPanel(DogmaticsAudioProcessor &p) : processor(p),
 	gain.setTextValueSuffix(" Volume");
 	gain.setValue(1.0);
 
-	gain.setBoundsRelative(0.01f,0.1f,0.05f,0.5f);
 
 	sine.setButtonText("Sine");
-	sine.setBoundsRelative(0.3f, 0.1f, 0.2f, 0.1f);
 	sine.onClick = [&]() { processor.setHarmonics(Sine); };
 
 	saw.setButtonText("Saw");
-	saw.setBoundsRelative(0.3f, 0.3f, 0.2f, 0.1f);
 	saw.onClick = [&]() { processor.setHarmonics(Saw); };
 
 	square.setButtonText("Square");
-	square.setBoundsRelative(0.3f, 0.5f, 0.2f, 0.1f);
 	square.onClick = [&]() { processor.setHarmonics(Square); };
 
 	triangle.setButtonText("Triangle");
-	triangle.setBoundsRelative(0.3f, 0.7f, 0.2f, 0.1f);
 	triangle.onClick = [&]() { processor.setHarmonics(Triangle); };
 
 	addAndMakeVisible(gain);
@@ -43,8 +38,13 @@ EffectsPanel::EffectsPanel(DogmaticsAudioProcessor &p) : processor(p),
 EffectsPanel::~EffectsPanel() {
 }
 
-void EffectsPanelclear() {}
-void EffectsPanel::resized() { 
+//void EffectsPanel::clear() {}
+void EffectsPanel::resized() {
+	gain.setBoundsRelative(0.01f, 0.1f, 0.05f, 0.5f);
+	sine.setBoundsRelative(0.3f, 0.1f, 0.2f, 0.1f);
+	saw.setBoundsRelative(0.3f, 0.3f, 0.2f, 0.1f);
+	square.setBoundsRelative(0.3f, 0.5f, 0.2f, 0.1f);
+	triangle.setBoundsRelative(0.3f, 0.7f, 0.2f, 0.1f);
 }
 
 void EffectsPanel::paint(Graphics& g) {

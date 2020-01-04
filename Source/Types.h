@@ -23,7 +23,7 @@
 namespace Kyle
 {
 	#define pi 3.14159265358
-	#define WAVEFORM_SIZE 256
+	#define WAVEFORM_SIZE 512
 	#define OVERSAMPLE_FACTOR 1
 	#define FLOATTYPE double
 
@@ -37,95 +37,6 @@ namespace Kyle
 	//==============================================
 	typedef complex<FLOATTYPE> Complex;
 
-	/*class Complex {
-	public:
-		explicit inline Complex(const complex<double> theValue) : value(theValue) {}
-		inline Complex() {
-			value = complex<double>();
-		}
-
-		Complex(double real, double imag) {
-			value = complex<double>();
-			value.real(real);
-			value.imag(imag);
-		}
-		
-		Complex(Complex &a) {
-			value = complex<double>();
-			value.real(a.real());
-			value.imag(a.imag());
-		}
-
-
-		Complex& operator=(const Complex &a) {
-			if (this == &a)
-				return *this;
-
-			value.real(a.real());
-			value.imag(a.imag());
-			return *this;
-		}
-
-		Complex operator =(const complex<double> a)
-		{
-			value = a;
-			return *this;
-		}
-
-		Complex operator =(const double d)
-		{
-			value = d;
-			return *this;
-		}
-
-		Complex operator /(double d)
-		{
-			return Complex(value / d);
-		}
-
-		Complex operator +(Complex a)
-		{
-			return Complex(value + a.value);
-		}
-
-		Complex operator +=(Complex a)
-		{
-			value += a.value;
-			return *this;
-		}
-
-		Complex operator *=(Complex a)
-		{
-			value *= a.value;
-			return *this;
-		}
-
-		Complex operator *(Complex a)
-		{
-			return Complex(value * a.value);
-		}
-
-		Complex operator -(Complex a)
-		{
-			return Complex(value - a.value);
-		}
-
-		double real() { return value.real(); }
-		double real(double x) {
-			value.real(x);
-			return x;
-		}
-		double imag() { return value.imag(); }
-		double imag(double x) {
-			value.imag(x);
-			return x;
-		}
-
-		complex<double> getValue() { return value; }
-	protected:
-		complex<double> value;
-	};*/
-	
 	// Basic wave functions
 	//==============================================
 	typedef function<void(Complex*, int)> Wave;
@@ -275,7 +186,7 @@ namespace Kyle
 
 	// Interpolate
 	static double CubicInterpolate(Complex *theSamples, int theSize, double thePos, bool theUseImag = false) {
-		int pos = floor(thePos);
+		int pos = (int)thePos;
 		double t = thePos - pos;
 		double a = theUseImag ? theSamples[GetIndexClamped(pos - 1, theSize)].imag() : theSamples[GetIndexClamped(pos - 1, theSize)].real();
 		double b = theUseImag ? theSamples[GetIndexClamped(pos, theSize)].imag() : theSamples[GetIndexClamped(pos, theSize)].real();
