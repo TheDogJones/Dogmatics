@@ -14,51 +14,62 @@ using namespace Kyle;
 // Constructor
 DogmaticsAudioProcessorEditor::DogmaticsAudioProcessorEditor(DogmaticsAudioProcessor& p) : AudioProcessorEditor(p), processor(p),
 	myKeyboard(p.myKeyboardState, MidiKeyboardComponent::horizontalKeyboard),
-	myContainer(make_unique<Component>("Container"))
-{
-	setResizable(true, true);
-	setSize(1200, 800);
-	//testFFT();
+	myContainer(make_unique<Component>("Container")),
+	myTabbedComponent(TabbedButtonBar::Orientation::TabsAtTop)
+{	
 	buffer = new Queue<double>();
 	p.setBufferPointer(buffer);
-	
-	addChildComponent(*myContainer);
-	myContainer->setBoundsRelative(0.f, 0.f, 1.f, 0.85f);
-	myContainer->setVisible(true);
 
-	// The tabs are the main attraction of this component
-	//addAndMakeVisible(myTabbedComponent);
 	setName("Dogmatics");
 
 	myEffectsPanel = make_unique<EffectsPanel>(processor);
-	myContainer->addAndMakeVisible(*myEffectsPanel);
-	myEffectsPanel->setBoundsRelative(0.5f, 0.5f, 0.5f, 0.5f);
-	//myTabbedComponent.addTab("Effects", Colours::black, ep, true);
-	
 	mySpectralAnalyzer = make_unique<SpectralAnalyzer>(buffer);
-	myContainer->addAndMakeVisible(*mySpectralAnalyzer);
-	mySpectralAnalyzer->setBoundsRelative(0.5f, 0.f, 0.5f, 0.5f);
-	mySpectralAnalyzer->setSampleRate(p.getSampleRate());
-	//myTabbedComponent.addTab("Spectral Analyzer", Colours::black, sa, true);
-	
 	myHarmonicDesigner = make_unique<HarmonicDesigner>(*this);
-	myContainer->addAndMakeVisible(*myHarmonicDesigner);
-	myHarmonicDesigner->setBoundsRelative(0.f, 0.5f, 0.5f, 0.5f);
-	//myTabbedComponent.addTab("Harmonic Designer", Colours::black, myHarmonicDesigner, true);
-	myHarmonicDesigner->addActionListener(this);
-
 	myOscilloscope = make_unique<Oscilloscope>(*this);
-	myContainer->addAndMakeVisible(*myOscilloscope);
-	myOscilloscope->setBoundsRelative(0.f, 0.f, 0.5f, 0.5f);
-	//myTabbedComponent.addTab("Oscilloscope", Colours::black, osc, true);
+
+	mySpectralAnalyzer->setSampleRate(p.getSampleRate());
+	myHarmonicDesigner->addActionListener(this);
 	
-	//myKeyboard.getOctaveForMiddleC
+	if (use_tabs) {
+		addAndMakeVisible(myTabbedComponent);
+		myTabbedComponent.setBoundsRelative(0.f, 0.f, 1.f, 1.f - keyboardScale);
+
+		myEffectsPanel->setBounds(getLocalBounds());
+		myTabbedComponent.addTab("Effects", Colours::black, myEffectsPanel.get(), true);
+
+		mySpectralAnalyzer->setBounds(getLocalBounds());
+		myTabbedComponent.addTab("Spectral Analyzer", Colours::black, mySpectralAnalyzer.get(), true);
+
+		myHarmonicDesigner->setBounds(getLocalBounds());
+		myTabbedComponent.addTab("Harmonic Designer", Colours::black, myHarmonicDesigner.get(), true);
+
+		myOscilloscope->setBounds(getLocalBounds());
+		myTabbedComponent.addTab("Oscilloscope", Colours::black, myOscilloscope.get(), true);
+	}
+	else {
+		addChildComponent(*myContainer);
+		myContainer->setBoundsRelative(0.f, 0.f, 1.f, 1.f - keyboardScale);
+		myContainer->setVisible(true);
+
+		myContainer->addAndMakeVisible(myEffectsPanel.get());
+		myEffectsPanel->setBoundsRelative(0.5f, 0.5f, 0.5f, 0.5f);
+
+		myContainer->addAndMakeVisible(mySpectralAnalyzer.get());
+		mySpectralAnalyzer->setBoundsRelative(0.5f, 0.f, 0.5f, 0.5f);
+
+		myContainer->addAndMakeVisible(myHarmonicDesigner.get());
+		myHarmonicDesigner->setBoundsRelative(0.f, 0.5f, 0.5f, 0.5f);
+
+		myContainer->addAndMakeVisible(myOscilloscope.get());
+		myOscilloscope->setBoundsRelative(0.f, 0.f, 0.5f, 0.5f);
+	}
+	
 	addAndMakeVisible(myKeyboard);
-	myKeyboard.setBoundsRelative(0.f, 0.85f, 1.f, 0.15f);
+	myKeyboard.setBoundsRelative(0.f, 1.f - keyboardScale, 1.f, keyboardScale);
 	myKeyboard.setKeyWidth((float)myKeyboard.getWidth() / 75.0f);
-	//myTabbedComponent.setBoundsInset(BorderSize(0));
-	
-	//processor.editorCallBack(this);
+
+	setResizable(true, true);
+	setSize(1200, 800);
 }
 
 DogmaticsAudioProcessor& DogmaticsAudioProcessorEditor::getProcessor() const
@@ -88,21 +99,22 @@ void DogmaticsAudioProcessorEditor::harmonicsChanged() {
 
 void DogmaticsAudioProcessorEditor::resized()
 {
-	auto r = myContainer->getBoundsInParent();
-	myContainer->setBoundsRelative(0.f, 0.f, 1.f, 1.f - keyboardScale);
-	if (myEffectsPanel)
-		myEffectsPanel->setBoundsRelative(0.5f, 0.5f, 0.5f, 0.5f);
-	if (mySpectralAnalyzer)
-		mySpectralAnalyzer->setBoundsRelative(0.5f, 0.f, 0.5f, 0.5f);
-	if (myHarmonicDesigner)
-		myHarmonicDesigner->setBoundsRelative(0.f, 0.5f, 0.5f, 0.5f); 
-	if (myOscilloscope)
-		myOscilloscope->setBoundsRelative(0.f, 0.f, 0.5f, 0.5f);
+	if(use_tabs) {
+		myTabbedComponent.setBoundsRelative(0.f, 0.f, 1.f, 1.f - keyboardScale);
+	}
+	else {
+		myContainer->setBoundsRelative(0.f, 0.f, 1.f, 1.f - keyboardScale);
+		if (myEffectsPanel)
+			myEffectsPanel->setBoundsRelative(0.5f, 0.5f, 0.5f, 0.5f);
+		if (mySpectralAnalyzer)
+			mySpectralAnalyzer->setBoundsRelative(0.5f, 0.f, 0.5f, 0.5f);
+		if (myHarmonicDesigner)
+			myHarmonicDesigner->setBoundsRelative(0.f, 0.5f, 0.5f, 0.5f);
+		if (myOscilloscope)
+			myOscilloscope->setBoundsRelative(0.f, 0.f, 0.5f, 0.5f);
+	}
 
 	myKeyboard.setBoundsRelative(0.f, 1.f-keyboardScale, 1.f, keyboardScale);
-	
-	
-	const int w = getWidth(), h = getHeight();	
 	myKeyboard.setKeyWidth((float)myKeyboard.getWidth() / 75.0f);
 }
 

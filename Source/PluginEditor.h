@@ -36,10 +36,11 @@ public:
 	void harmonicsChanged();
 		
 private:
+	const bool use_tabs = false;
 	const float keyboardScale = 0.15f;
 	
 	MidiKeyboardComponent myKeyboard;
-	//TabbedComponent myTabbedComponent;
+	TabbedComponent myTabbedComponent;
 	unique_ptr<Component> myContainer;
 	unique_ptr<Oscilloscope> myOscilloscope;
 	unique_ptr<SpectralAnalyzer> mySpectralAnalyzer;
