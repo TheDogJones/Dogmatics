@@ -63,17 +63,27 @@ GLfloat HarmonicDesigner::GlobalToWorldX(GLfloat theXClick) {
 }
 
 int HarmonicDesigner::GlobalToHarmonicX(GLfloat theXClick) {
-	return (int)floorl(GlobalToWorldX(theXClick) / 4);
+	return clamp((int)floorl(GlobalToWorldX(theXClick) / 4),1,WAVEFORM_SIZE >> 2);
 }
 
 GLfloat HarmonicDesigner::GlobalToMagnitudeY(GLfloat theYClick) {
 	if (theYClick > getHeight()) { return 0; }
 	if (theYClick < 0) { return 2; }
-	return 2-2*(theYClick / getHeight());
+	return 2 - 2 * theYClick / getHeight();
+}
+
+GLfloat HarmonicDesigner::GlobalToPhaseY(GLfloat theYClick) {
+	if (theYClick > getHeight()) { return -pi+0.001; }
+	if (theYClick < 0) { return pi-0.001; }
+	return pi - twoPi * theYClick / getHeight();
 }
 
 GLfloat HarmonicDesigner::MagnitudeToWorldY(GLfloat mag, int bin) {
 	return NormalizeGLY(mag*bin/4, 0, 2);
+}
+
+GLfloat HarmonicDesigner::PhaseToWorldY(GLfloat phase) {
+	return NormalizeGLY(phase, -pi, pi);
 }
 
 GLfloat HarmonicDesigner::NormalizePixelY(GLfloat location, GLfloat min, GLfloat max) {
@@ -89,7 +99,7 @@ GLfloat HarmonicDesigner::NormalizeGLY(GLfloat location, GLfloat min, GLfloat ma
 	GLfloat scaling = yHeight / myHeight;
 
 	// translation
-	GLfloat centerDistance = (yMax + yMin) / 2 - (max + min) / 2;
+	GLfloat centerDistance = (yMax + yMin) / 2 - (max + min)*scaling / 2;
 
 	return location * scaling + centerDistance;
 }
@@ -123,33 +133,64 @@ void HarmonicDesigner::render() {
 	glVertex2f(xMax, yMin);
 	glEnd();
 
-	//------------------------------------
-	// Drawing harmonics:
-	//
-	// The real components contain magnitude
-	// data that will be IFFT'd into a signal.
-	//
-	// Draw the harmonic as a vertical
-	// bar wherever the magnitude > 0.
-	//
-	//------------------------------------
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glBegin(GL_QUADS);
-	for (int i = 1; i < WAVEFORM_SIZE >> 2; i++) {
-		double mag = abs(myHarmonics[i]);
-		GLfloat x = (GLfloat)(i << 2);
-		if (mag > 0) {
-			GLfloat y = MagnitudeToWorldY(mag, x);
-			glColor4f(25 * mag, 0, 10 * x, 0.5);
+	if (viewingPhases) {
+		//------------------------------------
+		// Drawing phases:
+		//
+		// Calculate the phase by taking the
+		// arctan of the ratio of the real and
+		// imaginary components.
+		//
+		// Draw the harmonic as a vertical
+		// bar wherever the magnitude > 0.
+		//
+		//------------------------------------
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glBegin(GL_QUADS);
+		for (int i = 1; i < WAVEFORM_SIZE >> 2; i++) {
+			double phase = atan2(myHarmonics[i].imag(), myHarmonics[i].real());
+			double im = myHarmonics[i].imag();
+			double re = myHarmonics[i].real();
+			GLfloat x = (GLfloat)(i << 2);
+			GLfloat y = PhaseToWorldY(phase);
+			glColor4f(0.5, 0, 10 * x, 0.5);
 			glVertex2f(x, -1);
 			glVertex2f(x, y);
 			glVertex2f(x + 2, y);
 			glVertex2f(x + 2, -1);
 		}
+		glEnd();
 	}
-	glEnd();
-
+	else {
+		//------------------------------------
+		// Drawing harmonics:
+		//
+		// Calculate the harmonic amplitudes
+		// by taking the absolute value of the
+		// complex numbers in each bin.
+		//
+		// Draw the harmonic as a vertical
+		// bar wherever the magnitude > 0.
+		//
+		//------------------------------------
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glBegin(GL_QUADS);
+		for (int i = 1; i < WAVEFORM_SIZE >> 2; i++) {
+			GLfloat x = (GLfloat)(i << 2);
+			double mag = abs(myHarmonics[i]);
+			if (mag > 0) {
+				GLfloat y = MagnitudeToWorldY(mag, x);
+				glColor4f(25 * mag, 0, 10 * x, 0.5);
+				glVertex2f(x, -1);
+				glVertex2f(x, y);
+				glVertex2f(x + 2, y);
+				glVertex2f(x + 2, -1);
+			}
+		}
+		glEnd();
+	}
 	// Render waveform
 	glColor3ub(200, 100, 0);
 	glLineWidth(1.0f);
@@ -164,21 +205,44 @@ void HarmonicDesigner::render() {
 //=======================================================================================
 // Mouse click handlers. Still a lot of work to do on these.
 void HarmonicDesigner::mouseUp(const MouseEvent & theEvent) {
-	if (theEvent.x > xMax || theEvent.x < xMin) { return; }
-	int bin = GlobalToHarmonicX((GLfloat)theEvent.x);
-	if (bin == 0) { return; }
-	double mag = GlobalToMagnitudeY((GLfloat)theEvent.y)/bin;
-	myHarmonics[bin].imag(mag);
-	sendActionMessage(to_string(bin) + " " + to_string((mag)));
-	harmonicsChanged = true;
+	if (theEvent.mods.isRightButtonDown()) {
+		viewingPhases = !viewingPhases;
+		return;
+	}
+
+	modulateHarmonic((GLfloat)theEvent.y, GlobalToHarmonicX((GLfloat)theEvent.x));
 }
 
 void HarmonicDesigner::mouseDrag(const MouseEvent & theEvent) {
-	int bin = GlobalToHarmonicX((GLfloat)theEvent.x);
-	if (bin == 0 || bin > WAVEFORM_SIZE >> 2) { return; }
-	double mag = GlobalToMagnitudeY((GLfloat)theEvent.y) / bin;
-	myHarmonics[bin].imag(mag);
-	sendActionMessage(to_string(bin) + " " + to_string((mag)));
+	// Dragging does nothing for right clicks
+	if (theEvent.mods.isRightButtonDown()) {
+		return;
+	}
+	modulateHarmonic((GLfloat)theEvent.y, GlobalToHarmonicX((GLfloat)theEvent.x));
+
+}
+
+void HarmonicDesigner::modulateHarmonic(GLfloat theYClick, int theBin) {
+	if (viewingPhases) {
+		// modify phase value
+		double phase = GlobalToPhaseY(theYClick)-piOverTwo;
+		myHarmonics[theBin] = Complex(0, abs(myHarmonics[theBin]));
+		myHarmonics[theBin] *= Complex(cos(phase), sin(phase));
+	}
+	else {
+		// modify amplitude value
+		double mag = GlobalToMagnitudeY(theYClick) / theBin;
+		if (myHarmonics[theBin].real() == 0) {
+			myHarmonics[theBin].imag(mag);
+		}
+		else if (myHarmonics[theBin].imag() == 0) {
+			myHarmonics[theBin].real(mag);
+		}
+		else {
+			myHarmonics[theBin] *= (mag / myHarmonics[theBin]);
+		}
+	}
+	sendActionMessage(to_string(theBin) + " " + to_string(myHarmonics[theBin].real()) + " " + to_string(myHarmonics[theBin].imag()));
 	harmonicsChanged = true;
 }
 

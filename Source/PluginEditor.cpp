@@ -63,13 +63,14 @@ DogmaticsAudioProcessorEditor::DogmaticsAudioProcessorEditor(DogmaticsAudioProce
 		myContainer->addAndMakeVisible(myOscilloscope.get());
 		myOscilloscope->setBoundsRelative(0.f, 0.f, 0.5f, 0.5f);
 	}
+
+	setResizable(true, true);
+	setSize(1200, 800);
 	
 	addAndMakeVisible(myKeyboard);
 	myKeyboard.setBoundsRelative(0.f, 1.f - keyboardScale, 1.f, keyboardScale);
 	myKeyboard.setKeyWidth((float)myKeyboard.getWidth() / 75.0f);
 
-	setResizable(true, true);
-	setSize(1200, 800);
 }
 
 DogmaticsAudioProcessor& DogmaticsAudioProcessorEditor::getProcessor() const
@@ -126,8 +127,10 @@ void DogmaticsAudioProcessorEditor::setSampleRate(int theSampleRate) {
 
 void DogmaticsAudioProcessorEditor::actionListenerCallback(const String & message) {
 	string s = message.toStdString();
-	int space = s.find(' ');
-	int bin = stoi(s.substr(0, space));
-	double mag = stod(s.substr(space + 1, s.length()));
-	getProcessor().changeHarmonic(bin, mag);
+	int space1 = s.find(' ');
+	int space2 = s.find(' ', space1+1);
+	int bin = stoi(s.substr(0, space1));
+	double real = stod(s.substr(space1 + 1, space2));
+	double imag = stod(s.substr(space2 + 1, s.length()));
+	getProcessor().changeHarmonic(bin, real, imag);
 }

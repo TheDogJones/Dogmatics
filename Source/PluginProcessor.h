@@ -30,7 +30,7 @@ public:
 	
 	void setBufferPointer(Queue<double>::Ptr buffer);
 	
-	void changeHarmonic(int theBin, double theMagnitude);
+	void changeHarmonic(int theBin, double theReal, double theImag);
 
 	void setHarmonics(Wave theWave);
 

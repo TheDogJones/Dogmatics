@@ -56,8 +56,8 @@ public:
 		Kyle::FFT::DoItBackwards(mySamples, WAVEFORM_SIZE);
 	}
 
-	void updateHarmonic(int bin, double mag) {
-		myHarmonics[bin] = Complex(0, mag);
+	void updateHarmonic(int bin, double theReal, double theImag) {
+		myHarmonics[bin] = Complex(theReal, theImag);
 		generateWaveform();
 	}
 

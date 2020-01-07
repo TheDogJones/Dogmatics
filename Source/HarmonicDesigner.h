@@ -24,7 +24,9 @@ public:
 	GLfloat GlobalToWorldX(GLfloat theXClick);
 	int GlobalToHarmonicX(GLfloat theXClick);
 	GLfloat GlobalToMagnitudeY(GLfloat theYClick);
+	GLfloat GlobalToPhaseY(GLfloat theYClick);
 	GLfloat MagnitudeToWorldY(GLfloat mag, int bin);
+	GLfloat PhaseToWorldY(GLfloat phase);
 	GLfloat NormalizeGLY(GLfloat location, GLfloat min, GLfloat max);
 	GLfloat NormalizePixelY(GLfloat location, GLfloat min, GLfloat max);
 
@@ -34,7 +36,7 @@ public:
 
 	void mouseUp(const MouseEvent &theEvent) override;
 	void mouseDrag(const MouseEvent &theEvent) override;
-
+	void modulateHarmonic(GLfloat theYClick, int theBin);
 	void mouseWheelMove(const MouseEvent &theEvent, const MouseWheelDetails &theWheelDetails) override;
 
 	DogmaticsAudioProcessorEditor &getParent() const {
@@ -47,6 +49,7 @@ private:
 	//==============================================================================
 	DogmaticsAudioProcessorEditor &parent;
 	HeapBlock<Complex> mySamples;
+
 	Complex *myHarmonics;
 	const GLfloat xMin = 0.0f;
 	const GLfloat xMax = (GLfloat)WAVEFORM_SIZE;
@@ -55,6 +58,7 @@ private:
 	GLfloat waveMax, waveMin;
 	GLuint list;
 	
+	bool viewingPhases = false;
 	bool calculatingWave = false;
 	bool harmonicsChanged = true;
 	//==============================================================================

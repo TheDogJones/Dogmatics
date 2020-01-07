@@ -23,6 +23,9 @@
 namespace Kyle
 {
 	#define pi 3.14159265358
+	#define piOverTwo 1.57079632679
+	#define twoPi 6.28318530717
+
 	#define WAVEFORM_SIZE 512
 	#define OVERSAMPLE_FACTOR 1
 	#define FLOATTYPE double

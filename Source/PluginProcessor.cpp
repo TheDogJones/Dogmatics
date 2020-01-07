@@ -47,11 +47,11 @@ void DogmaticsAudioProcessor::initializeSynth() {
 
 //==============================================================================
 
-void DogmaticsAudioProcessor::changeHarmonic(int theBin, double theMagnitude) {
-	myHarmonics[theBin] = Complex(0, theMagnitude);
+void DogmaticsAudioProcessor::changeHarmonic(int theBin, double theReal, double theImag) {
+	myHarmonics[theBin] = Complex(theReal, theImag);
 	
 	for (int i = 0; i < mySynthesizer.getNumVoices(); i++) {
-		((HarmonicWaveformVoice*)mySynthesizer.getVoice(i))->updateHarmonic(theBin, theMagnitude);
+		((HarmonicWaveformVoice*)mySynthesizer.getVoice(i))->updateHarmonic(theBin, theReal, theImag);
 	}
 }
 
