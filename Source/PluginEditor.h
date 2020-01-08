@@ -36,7 +36,7 @@ public:
 	void harmonicsChanged();
 		
 private:
-	const bool use_tabs = false;
+	const bool use_tabs = true;
 	const float keyboardScale = 0.15f;
 	
 	MidiKeyboardComponent myKeyboard;

@@ -150,8 +150,6 @@ void HarmonicDesigner::render() {
 		glBegin(GL_QUADS);
 		for (int i = 1; i < WAVEFORM_SIZE >> 2; i++) {
 			double phase = atan2(myHarmonics[i].imag(), myHarmonics[i].real());
-			double im = myHarmonics[i].imag();
-			double re = myHarmonics[i].real();
 			GLfloat x = (GLfloat)(i << 2);
 			GLfloat y = PhaseToWorldY(phase);
 			glColor4f(0.5, 0, 10 * x, 0.5);

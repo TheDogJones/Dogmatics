@@ -74,23 +74,14 @@ public:
 
 	void startNote(int midiNoteNumber, float velocity,
 				   SynthesiserSound* /*sound*/,
-				   int /*currentPitchWheelPosition*/) override {
+				   int currentPitchWheelPosition) override {
 		myTheta = 0.0;
 		level = velocity * 0.2;
 		tailOff = 0.0;
-		
-		// Get the fundamental double of our midi note
-		double freq = MidiMessage::getMidiNoteInHertz(midiNoteNumber);
-		//DBG(log2(freq));
 
-		// Assuming our harmonic #1 is the fundamental, find the harmonic that
-		// passes the Nyquist double, and cutoff everything above that.
-		// This is how we prevent aliasing.
-		int cutoff_bin = (int)(getSampleRate() / 2.0f / freq);
-
-		// myDelta is the amount the phase of the waveform will shift with each
-		// sample. Will be larger on higher notes (higher freq.)
-		myDelta = 2 * pi / cutoff_bin;
+		myMidiNote = midiNoteNumber;
+		shiftPitch(currentPitchWheelPosition);
+		myFrequency = MidiMessage::getMidiNoteInHertz(midiNoteNumber);
 	}
 
 	void stopNote(float /*velocity*/, bool allowTailOff) override {
@@ -105,11 +96,24 @@ public:
 			// we're being told to stop playing immediately, so reset everything..
 			clearCurrentNote();
 			myDelta = 0.0;
+			myMidiNote = -1;
 		}
 	}
 
-	void pitchWheelMoved(int /*newValue*/) override {
-		// do this later
+	void pitchWheelMoved(int theValue) override {
+		shiftPitch(theValue);
+	}
+
+	void shiftPitch(int thePitchWheelPosition) {
+		// This message comes in as a value from 0-16383. 8191 represents zero pitch bend.
+		// Convert to a logarithmic range from 1/2 to 2
+		if (thePitchWheelPosition == 16383) {
+			// The pitch wheel only goes up to 2^14 - 1, so we need to correct for the max value
+			myPitchShift = 2.0f;
+		}
+		else {
+			myPitchShift = ((double)thePitchWheelPosition) / 4096.0f - 2.0f;			
+		}
 	}
 
 	void controllerMoved(int /*controllerNumber*/, int /*newValue*/) override {
@@ -128,7 +132,20 @@ public:
 	void render(AudioBuffer<FT>& outputBuffer, int startSample, int numSamples) {
 		int theStartSample = startSample;
 		int theNumSamples = numSamples;
-		if(myDelta != 0.0) {
+
+		if(myMidiNote != -1) {
+			// Multiply frequency by twelfthRootTwo * shift factor
+			myFrequency = MidiMessage::getMidiNoteInHertz(myMidiNote) * std::pow(twelfthRootTwo, myPitchShift);
+
+			// Assuming our harmonic #1 is the fundamental, find the harmonic that
+			// passes the Nyquist frequency, and cutoff everything above that.
+			// This is how we prevent aliasing.
+			int cutoff_bin = (int)(getSampleRate() / 2.0f / myFrequency);
+
+			// myDelta is the amount the phase of the waveform will shift with each
+			// sample. Will be larger on higher notes (higher freq.)
+			myDelta = 2 * pi / cutoff_bin;
+
 			// If the note has been released, slowly tail off.
 			if(tailOff > 0) {
 				while(--theNumSamples >= 0) {
@@ -154,6 +171,7 @@ public:
 						// tells the synth that this voice has stopped
 						clearCurrentNote();
 						myDelta = 0.0;
+						myMidiNote = -1;
 						break;
 					}
 				}
@@ -216,8 +234,9 @@ public:
 		return mySamples;
 	}
 protected:
-	double level, tailOff, waveScale;
 	HeapBlock<Complex> mySamples, myHarmonics;
-	double myTheta, myDelta;
+	int myMidiNote;
+	double level, tailOff, waveScale;
+	double myTheta, myDelta,  myFrequency, myPitchShift;
 };
-#endif // !_KYLE_HARMONIC_SYNTH_
+#endif // _KYLE_HARMONIC_SYNTH_
